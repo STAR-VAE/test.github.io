@@ -1,16 +1,16 @@
 // cases.js
 window.VAE_CASES = [
   {
-    id: "01/1051200.2min",
+    id: "00/1211600.2min",
     title: "Sing",
     note: "Listen to human voice",
     tracks: {
-      "Ground Truth":   "cases/recon/00/1051200.2min/gt.wav",
-      "Mel-VAE":   "cases/recon/00/1051200.2min/mel.wav",
-      "AudioGen":   "cases/recon/00/1051200.2min/audiogen.wav",
-      "&epsilon;ar-VAE":   "cases/recon/00/1051200.2min/ear.wav",
-      "Stable Audio Open": "cases/recon/00/1051200.2min/sao.wav",
-      "STAR-VAE": "cases/recon/00/1051200.2min/star.wav",
+      "Ground Truth":   "cases/recon/00/1211600.2min/gt.wav",
+      "Mel-VAE":   "cases/recon/00/1211600.2min/mel.wav",
+      "AudioGen":   "cases/recon/00/1211600.2min/audiogen.wav",
+      "&epsilon;ar-VAE":   "cases/recon/00/1211600.2min/ear.wav",
+      "Stable Audio Open": "cases/recon/00/1211600.2min/sao.wav",
+      "STAR-VAE": "cases/recon/00/1211600.2min/star.wav",
     }
   },
   {

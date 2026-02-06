@@ -1,11 +1,8 @@
-// cases-ui.js
-
 function initVaeCases() {
   const CASES = window.VAE_CASES || [];
   const root = document.getElementById("cases-root");
   if (!root) return;
 
-  // 防止重复初始化（可选）
   if (root.dataset.inited) return;
   root.dataset.inited = "1";
 
@@ -39,12 +36,10 @@ function initVaeCases() {
        </div>`
     );
 
-    // single visible audio element
     const player = document.createElement("audio");
     player.controls = true;
     player.preload = "metadata";
 
-    // keep hidden audio elements for fast switching
     const keys = Object.keys(c.tracks);
     const audios = {};
     keys.forEach(k => {
@@ -66,7 +61,6 @@ function initVaeCases() {
       activeKey = nextKey;
       player.src = audios[nextKey].src;
 
-      // restore time after metadata is ready
       const onMeta = () => {
         player.currentTime = Math.min(t, player.duration || t);
         if (wasPlaying) player.play().catch(() => {});
@@ -78,7 +72,6 @@ function initVaeCases() {
       updateNowPlaying();
     }
 
-    // tabs
     const tabs = el("div", "case-tabs");
     const btns = {};
     keys.forEach(k => {
@@ -107,8 +100,6 @@ function initVaeCases() {
       now.textContent = `Now: ${decodeEntities(label)}`;
     }
 
-
-    // loop controls
     const loopBox = el("div", "loop-box");
     const loopToggle = el("label", "loop-toggle",
       `<input type="checkbox" class="loop-enabled"> <span>Loop segment</span>`
@@ -132,7 +123,6 @@ function initVaeCases() {
     endRow.append(endLabel, end);
     rangeWrap.append(startRow, endRow);
 
-    
     loopBox.append(loopToggle, rangeWrap);
 
     function slidersToTime() {
@@ -149,7 +139,6 @@ function initVaeCases() {
     }
 
     function enforceOrder() {
-      // ensure start < end
       if (+start.value >= +end.value) {
         if (this === start) start.value = Math.max(0, +end.value - 5);
         if (this === end) end.value = Math.min(1000, +start.value + 5);
@@ -162,16 +151,30 @@ function initVaeCases() {
 
     player.addEventListener("loadedmetadata", () => {
       updateLoopLabels();
-      // if duration is 0 until metadata, labels update here
     });
 
+    // ✅ 修复：改进的循环逻辑
     player.addEventListener("timeupdate", () => {
       if (!loopEnabled.checked) return;
+      
       const { s, e } = slidersToTime();
-      if (player.currentTime >= e) player.currentTime = s;
+      const ct = player.currentTime;
+      
+      // 如果超出范围，跳回起点
+      if (ct >= e - 0.1 || ct < s) {
+        player.currentTime = s;
+      }
     });
 
-    // init
+    // ✅ 额外保障：音频结束时重新循环
+    player.addEventListener("ended", () => {
+      if (!loopEnabled.checked) return;
+      
+      const { s } = slidersToTime();
+      player.currentTime = s;
+      setTimeout(() => player.play().catch(() => {}), 50);
+    });
+
     updateActiveBtn();
     updateNowPlaying();
     setActive(activeKey, false);
@@ -180,7 +183,6 @@ function initVaeCases() {
     return card;
   }
 
-  // render grid
   CASES.forEach(c => root.appendChild(makeCaseCard(c)));
 }
 
