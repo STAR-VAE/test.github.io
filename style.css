@@ -309,7 +309,7 @@ header, main, footer, .wrap { position: relative; z-index: 1; }
   border-spacing: 0;
   font-size: 14px;
   color: var(--text);
-  background: rgba(255,255,255,.78);
+  background: rgba(255,255,255,.90);
   border: 1px solid rgba(229,231,235,.95);
   border-radius: 14px;
   overflow: hidden; /* for rounded corners */
@@ -525,7 +525,7 @@ header, main, footer, .wrap { position: relative; z-index: 1; }
 
 .expand-card{
   border: 1px solid rgba(17,24,39,.12);
-  background: rgba(255,255,255,.78);
+  background: rgba(255,255,255, 1);
   box-shadow: 0 8px 22px rgba(0,0,0,.06);
   border-radius: 14px;
   padding: 14px;
