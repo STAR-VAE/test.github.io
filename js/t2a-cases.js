@@ -1,27 +1,5 @@
 window.T2A_CASES = [
   {
-    id: "1577",
-    prompt: "The sound of horn from a car approaching from a distance",
-    clips: {
-        "Ground Truth": "cases/t2a/1577/gt.wav",
-        "Stable Audio Open": "cases/t2a/1577/sao.wav",
-        "AudioLDM 2-large": "cases/t2a/1577/audio_ldm.wav",
-        "TangoFlux": "cases/t2a/1577/tangoflux.wav",
-        "STAR-Gen": "cases/t2a/1577/star.wav",
-    }
-  },
-  {
-    id: "13954",
-    prompt: "Rhythmic tick took",
-    clips: {
-        "Ground Truth": "cases/t2a/13954/gt.wav",
-        "Stable Audio Open": "cases/t2a/13954/sao.wav",
-        "AudioLDM 2-large": "cases/t2a/13954/audio_ldm.wav",
-        "TangoFlux": "cases/t2a/13954/tangoflux.wav",
-        "STAR-Gen": "cases/t2a/13954/star.wav",
-    }
-  },
-  {
     id: "17066",
     prompt: "Very loud explosions with pops and bursts of more explosions",
     clips: {
@@ -77,6 +55,17 @@ window.T2A_CASES = [
     }
   },
   {
+    id: "107174",
+    prompt: "A vehicle horn blares out a musical tune",
+    clips: {
+        "Ground Truth": "cases/t2a/107174/gt.wav",
+        "Stable Audio Open": "cases/t2a/107174/sao.wav",
+        "AudioLDM 2-large": "cases/t2a/107174/audio_ldm.wav",
+        "TangoFlux": "cases/t2a/107174/tangoflux.wav",
+        "STAR-Gen": "cases/t2a/107174/star.wav",
+    }
+  },
+  {
     id: "103193",
     prompt: "Motorcycle starting then driving away",
     clips: {
@@ -88,14 +77,25 @@ window.T2A_CASES = [
     }
   },
   {
-    id: "103372",
-    prompt: "A loud metal clank followed by pressurized air releasing as a truck engine runs idle before accelerating",
+    id: "103379",
+    prompt: "Firecrackers popping as a crowd of people cheer and whistle",
     clips: {
-        "Ground Truth": "cases/t2a/103372/gt.wav",
-        "Stable Audio Open": "cases/t2a/103372/sao.wav",
-        "AudioLDM 2-large": "cases/t2a/103372/audio_ldm.wav",
-        "TangoFlux": "cases/t2a/103372/tangoflux.wav",
-        "STAR-Gen": "cases/t2a/103372/star.wav",
+        "Ground Truth": "cases/t2a/103379/gt.wav",
+        "Stable Audio Open": "cases/t2a/103379/sao.wav",
+        "AudioLDM 2-large": "cases/t2a/103379/audio_ldm.wav",
+        "TangoFlux": "cases/t2a/103379/tangoflux.wav",
+        "STAR-Gen": "cases/t2a/103379/star.wav",
+    }
+  },
+  {
+    id: "103406",
+    prompt: "A crowd of people shout and give applause",
+    clips: {
+        "Ground Truth": "cases/t2a/103406/gt.wav",
+        "Stable Audio Open": "cases/t2a/103406/sao.wav",
+        "AudioLDM 2-large": "cases/t2a/103406/audio_ldm.wav",
+        "TangoFlux": "cases/t2a/103406/tangoflux.wav",
+        "STAR-Gen": "cases/t2a/103406/star.wav",
     }
   }
 ];
