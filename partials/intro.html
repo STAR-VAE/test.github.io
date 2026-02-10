@@ -1,0 +1,178 @@
+<section id="Core Methods at a Glance">
+    <h2 class="section-title">Core Methods at a Glance</h2>
+
+    <div class="expand-grid" id="framework-expands">
+
+        <!-- 1) STAR: Structured Constraint Field / Capacity Gradient -->
+        <article class="expand-card" tabindex="0" aria-expanded="false">
+            <div class="expand-head">
+            <h3>STAR: Structured Constraint Field</h3>
+            <p class="expand-summary">
+                STAR replaces the uniform KL penalty with a channel-wise constraint field, creating a "capacity gradient"
+                that aligns the latent space with audio's intrinsic structure→texture hierarchy.
+            </p>
+            <div class="expand-hint">Click anywhere to expand</div>
+            </div>
+
+            <div class="expand-body" aria-hidden="true">
+            <ul class="reveal-lines">
+                <li>
+                <b>Problem:</b> isotropic priors + uniform KL encourage <i>disordered information packing</i>:
+                deterministic structure and stochastic texture get mixed, hurting both reconstruction stability and generative usability.
+                </li>
+                <li>
+                <b>Key idea (Capacity Gradient):</b> split the latent space into two continuous functional zones:
+                <b>High-Capacity / Low-β</b> (a "Safe Harbor" for non-Gaussian, semantic, deterministic <i>Structure</i>)
+                and <b>Low-Capacity / High-β</b> (a "Noise Floor" for high-entropy <i>Texture</i>, residual noise, or channel pruning).
+                </li>
+                <li>
+                <b>Implementation:</b> keep reconstruction/adversarial objectives unchanged, but replace the single scalar β·KL
+                with a <b>channel-wise weighted</b> KL term, yielding an anisotropic optimization that induces an ordered topology.
+                </li>
+                <li>
+                <b>Effect (Inductive Ordering):</b> the encoder learns to route global dependencies to low-index channels
+                (<b>Structure Subspace</b>) and local stochastic details to high-index channels (Texture), rather than mixing them arbitrarily.
+                </li>
+            </ul>
+            
+            <div class="eq-box eq-sm">
+  $$\mathcal{L}_{\text{STAR}} = \sum_{c=1}^{C} \beta_c \cdot
+  D_{\mathrm{KL}}\!\left(q_\phi(z_c|x)\,\|\,\mathcal{N}(0,1)\right)$$
+</div>
+
+
+        </article>
+
+        <!-- 2) Gamma-growth: why power law & why convex (γ>1) -->
+        <article class="expand-card" tabindex="0" aria-expanded="false">
+            <div class="expand-head">
+            <h3>Gamma-Growth β Curve (Power-Law Allocation)</h3>
+            <p class="expand-summary">
+                The transition from "Safe Harbor" to "Noise Floor" is not binary. STAR parameterizes $\beta$ across channels with a power-law (gamma-growth) curve to match heavy-tailed audio spectra (1/f or Zipf-like decay).
+            </p>
+            <div class="expand-hint">Click anywhere to expand</div>
+            </div>
+
+            <div class="expand-body" aria-hidden="true">
+            <ul class="reveal-lines">
+                <li>
+                <b>Why not step:</b> a step function enforces an artificial binary split, ignoring the continuous spectrum of audio features.
+                </li>
+                <li>
+                <b>Why not linear:</b> linear growth provides a gradient but cannot model the non-linear decay of information content in natural signals.
+                </li>
+                <li>
+                <b>Information-theoretic motivation:</b> natural signals (incl. audio/spectrograms) exhibit <b>power-law energy decay</b>
+                (Zipf's law or 1/f noise), meaning the "value" of latent factors decreases polynomially. Capacity allocation should therefore follow a power law.
+                </li>
+                <li>
+                <b>Convex choice ($\gamma &gt; 1$):</b> slows $\beta$ growth at low channel indices, effectively <b>widening</b> the low-$\beta$ region so more channels
+                are available for information-dense structural content (fundamentals, formants, long-range dependencies).
+                Concave/linear growth would penalize these early, forcing structure to be discarded or pushed into high-$\beta$ channels—reintroducing disorder.
+                </li>
+
+            </ul>
+            
+            
+            <div class="eq-box eq-sm">
+            $$\beta_c = \beta_{\min} + (\beta_{\max}-\beta_{\min})\left(\frac{c-1}{C-1}\right)^{\gamma}$$
+            </div>
+
+            </div>
+        </article>
+
+        <!-- 3) STAR-VAE: Hybrid CNN-Mamba encoder/decoder -->
+        <article class="expand-card" tabindex="0" aria-expanded="false">
+            <div class="expand-head">
+            <h3>STAR-VAE: Hybrid CNN-Mamba Architecture</h3>
+            <p class="expand-summary">
+                With STAR's ordered topology, we can safely use high-capacity sequence modeling for global audio dynamics.
+                STAR-VAE combines CNN locality with Mamba's linear-time long-context modeling to reduce reconstruction drift.
+            </p>
+            <div class="expand-hint">Click anywhere to expand</div>
+            </div>
+
+            <div class="expand-body" aria-hidden="true">
+            <ul class="reveal-lines">
+                <li>
+                <b>Local downsampling (CNN):</b> strided ResNet blocks extract fine spectral details and compress time resolution,
+                avoiding the quadratic cost of operating on raw samples with attention.
+                </li>
+                <li>
+                <b>Global context (Bi-Mamba):</b> the compressed sequence is processed by a bidirectional Mamba backbone.
+                Unlike Transformers (O(T²)), Mamba models long-range dependencies in <b>O(T)</b> using a selective state space mechanism.
+                </li>
+                <li>
+                <b>Why Mamba pairs with STAR:</b> STAR creates a low-index <b>Structure Subspace</b> that stores global structure.
+                Mamba's <b>content-aware selectivity</b> can propagate these structural signals while filtering irrelevant noise,
+                maximizing the utility of that ordered subspace (instead of wasting capacity on texture/noise).
+                </li>
+                <li>
+                <b>Bottleneck projection + symmetric decode:</b> project context-rich features to the latent distribution regularized by STAR;
+                decode with a Mamba backbone for global coherence, then convolutional upsampling to recover waveform texture.
+                </li>
+            </ul>
+
+            <div class="eq-box eq-sm">
+  $$\textbf{Encoder:}\; x \rightarrow \mathrm{CNN}\!\downarrow \rightarrow \mathrm{Bi\text{-}Mamba}
+  \rightarrow \mathrm{proj} \rightarrow (\mu,\sigma) \rightarrow z$$
+
+  $$\textbf{Decoder:}\; z \rightarrow \mathrm{Mamba} \rightarrow \mathrm{CNN}\!\uparrow \rightarrow \hat{x}$$
+</div>
+
+            </div>
+        </article>
+
+        <!-- 4) STAR-Gen: LLM-based Flow Matching + Hybrid masking -->
+        <article class="expand-card" tabindex="0" aria-expanded="false">
+            <div class="expand-head">
+            <h3>STAR-Gen: LLM-based Flow Matching (No VQ)</h3>
+            <p class="expand-summary">
+                STAR-Gen bridges "LLM scalability" and "diffusion fidelity" by adapting a causal Transformer decoder
+                into a continuous conditional flow predictor over STAR latents—without vector quantization.
+            </p>
+            <div class="expand-hint">Click anywhere to expand</div>
+            </div>
+
+            <div class="expand-body" aria-hidden="true">
+            <ul class="reveal-lines">
+                <li>
+                <b>Motivation:</b> discrete AR (LLM) models scale well but suffer from <b>quantization artifacts</b>;
+                diffusion has high fidelity but integrates less naturally with LLM-style decoding. STAR-Gen targets the middle ground.
+                </li>
+                <li>
+                <b>Core formulation:</b> treat the decoder as a time-dependent velocity estimator
+                $v_θ(z_t, t | c)$ transporting noise $N(0,I)$ to the STAR-VAE latent data distribution.
+                Interpolate $z_t = (1-t)z_0 + t z_1$ with $z_0$~$N(0,I)$ and $z_1$ from STAR latents.
+                </li>
+                <li>
+                <b>No VQ (no codebook):</b> latents remain continuous and are used as frozen targets, avoiding discretization loss
+                and preserving fine-grained spectral details encoded by STAR-VAE.
+                </li>
+                <li>
+                <b>Hybrid attention / masking:</b> causal masking for text (language order), but <b>bidirectional</b> masking for noisy audio latents,
+                enabling global context refinement across the whole sequence during flow matching (non-AR generation dynamics).
+                </li>
+            </ul>
+
+            <div class="eq-box eq-sm">
+$$
+\mathcal{L}_{\mathrm{FM}}
+=\mathbb{E}_{t,\mathbf{z}_0,\mathbf{z}_1}\!\left[
+\left\| v_\theta(\mathbf{z}_t, t \mid \mathbf{c})-(\mathbf{z}_1-\mathbf{z}_0)\right\|^2
+\right]$$
+$$
+\qquad \mathrm{logit}(t)\sim \mathcal{N}(0,1).
+$$
+</div>
+
+            </div>
+        </article>
+
+
+
+    </div>
+
+
+
+</section>
