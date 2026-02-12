@@ -94,7 +94,7 @@ window.VAE_CASES = [
   {
     id: "ro",
     title: "Narration",
-    note: "Listen for the audio texture.",
+    note: "Focus on the speech.",
     tracks: {
       "Ground Truth":   "cases/recon/ro/gt.wav",
       "Mel-VAE":   "cases/recon/ro/mel.wav",
